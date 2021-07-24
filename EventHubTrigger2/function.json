@@ -1,0 +1,15 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "eventHubMessages",
+      "direction": "in",
+      "eventHubName": "bionova-iot-events",
+      "connection": "bionova-iot-hub-azure_events_IOTHUB",
+      "cardinality": "one",
+      "consumerGroup": "$Default"
+    }
+  ]
+}
+
+

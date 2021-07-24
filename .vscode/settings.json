@@ -1,0 +1,36 @@
+{
+  "azureFunctions.deploySubpath": ".",
+  "azureFunctions.postDeployTask": "npm install (functions)",
+  "azureFunctions.projectLanguage": "JavaScript",
+  "azureFunctions.projectRuntime": "~3",
+  "debug.internalConsoleOptions": "neverOpen",
+  "azureFunctions.preDeployTask": "npm prune (functions)",
+  "sqltools.connections": [
+    {
+      "pgOptions": {
+        "ssl": true
+      },
+      "previewLimit": 50,
+      "server": "db-postgresql.postgres.database.azure.com",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "pg-test-azure-bionova",
+      "database": "iotdemo",
+      "username": "WiselyDev@db-postgresql",
+      "password": "Bionova123"
+    },
+    {
+      "pgOptions": {
+        "ssl": true
+      },
+      "previewLimit": 50,
+      "server": "pgsql-bionova.postgres.database.azure.com",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "pg-bionova",
+      "username": "WiselyDev@pgsql-bionova",
+      "database": "postgres",
+      "password": "JYm52DbxCDE3AqE"
+    }
+  ]
+}
