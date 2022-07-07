@@ -1,34 +1,34 @@
 module.exports = async function (context, req) {
-    context.log('JavaScript HTTP trigger function processed a request.');
+    // context.log('JavaScript HTTP trigger function processed a request.');
 
     var Client = require('azure-iothub').Client;
     var Message = require('azure-iot-common').Message;
 
     var connectionString = 'HostName=bionova-iot-hub-azure.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=Vy1adq2cCoBeqhxg1VyP9vnPF7yF0g7TMIeUESfWIps=';
-    // var targetDevice = 'DTestCtoD';
-
     var serviceClient = Client.fromConnectionString(connectionString);
 
 
     const deviceId = (req.query.deviceid || (req.body && req.body.deviceid));
     const deviceTime = (req.query.time || (req.body && req.body.time));
     const msgId = (req.query.id || (req.body && req.body.id));
-    var result = 'success';
+    let result = 'failed';
 
     serviceClient.open(function (err) {
         if (err) {
-            console.error('Could not connect: ' + err.message);
+            // console.error('Could not connect: ' + err.message);
+            // return err.message;
             result = err.message;
         } else {
-            console.log('Service client connected');
+            // console.log('Service client connected');
             serviceClient.getFeedbackReceiver(receiveFeedback);
             var message = new Message(JSON.stringify({
                 time: deviceTime,
             }));
             message.ack = 'full';
             message.messageId = msgId;
-            console.log('Sending message: ' + message.getData());
+            // console.log('Sending message: ' + message.getData());
             serviceClient.send(deviceId, message, printResultFor('send'));
+            // return 'success';
         }
     });
 
@@ -46,11 +46,11 @@ module.exports = async function (context, req) {
     function printResultFor(op) {
         return function printResult(err, res) {
             if (err){
-                console.log(op + ' error: ' + err.toString());
+                // console.log(op + ' error: ' + err.toString());
                 result = err.toString();
             }
             if (res){
-                console.log(op + ' status: ' + res.constructor.name);
+                // console.log(op + ' status: ' + res.constructor.name);
                 result = res.constructor.name;
             }
         };
@@ -58,8 +58,8 @@ module.exports = async function (context, req) {
 
     function receiveFeedback(err, receiver){
         receiver.on('message', function (msg) {
-        console.log('Feedback message:')
-        console.log(msg.getData().toString('utf-8'));
+        // console.log('Feedback message:')
+        // console.log(msg.getData().toString('utf-8'));
         result = msg.getData().toString('utf-8');
         });
     }

@@ -9,36 +9,7 @@ module.exports = async function (context, req) {
 
     const deviceId = (req.query.deviceid || (req.body && req.body.deviceid));
     const msgId = (req.query.id || (req.body && req.body.id));
-    var result = 'success';
-
-    result = serviceClient.open(function (err) {
-        if (err) {
-            console.error('Could not connect: ' + err.message);
-            result = err.message;
-            return err.message;
-        } else {
-            console.log('Service client connected');
-            serviceClient.getFeedbackReceiver(receiveFeedback);
-            var message = new Message(JSON.stringify({
-                deviceid: deviceId,
-            }));
-            message.ack = 'full';
-            message.messageId = msgId;
-            console.log('Sending message: ' + message.getData());
-            serviceClient.send(deviceId, message, printResultFor('send'));
-        }
-    });
-
-    const responseMessage = deviceId + " " + msgId
-        ? result
-        : "Pass a params in the query string or in the request body for a personalized response.";
-
-    context.res = {
-        // status: 200, /* Defaults to 200 */
-        body: responseMessage
-    };
-
-    
+    var result = 'failed';
 
     function printResultFor(op) {
         return function printResult(err, res) {
@@ -55,11 +26,37 @@ module.exports = async function (context, req) {
 
     function receiveFeedback(err, receiver){
         receiver.on('message', function (msg) {
-        console.log('Feedback message:')
-        console.log(msg.getData().toString('utf-8'));
-        result = msg.getData().toString('utf-8');
+            console.log('Feedback message:')
+            console.log(msg.getData().toString('utf-8'));
+            result = msg.getData().toString('utf-8');
         });
     }
 
-    
+    serviceClient.open(function (err) {
+        if (err) {
+            console.error('Could not connect: ' + err.message);
+            // return err.message;
+            result = err.message;
+        } else {
+            console.log('Service client connected');
+            serviceClient.getFeedbackReceiver(receiveFeedback);
+            var message = new Message(JSON.stringify({
+                deviceid: deviceId,
+            }));
+            message.ack = 'full';
+            message.messageId = msgId;
+            console.log('Sending message: ' + message.getData());
+            serviceClient.send(deviceId, message, printResultFor('send'));
+            // return 'success';
+        }
+    });
+
+    const responseMessage = deviceId + " " + msgId
+        ? result
+        : "Pass a params in the query string or in the request body for a personalized response.";
+
+    context.res = {
+        // status: 200, /* Defaults to 200 */
+        body: responseMessage
+    };
 }
