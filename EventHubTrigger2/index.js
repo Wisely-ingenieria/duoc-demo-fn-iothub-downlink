@@ -2,11 +2,11 @@ module.exports = async function (context, eventHubMessages) {
     var pg = require('pg');
     
     const config = {
-                        host: 'pgsql-bionova.postgres.database.azure.com',
-                        user: 'WiselyDev@pgsql-bionova',
-                        password: 'JYm52DbxCDE3AqE',
-                        database: 'postgres',
-                        port: 5432,
+                        host: process.env["HOST_DB"],
+                        user: process.env["USER_DB"],
+                        password: process.env["PASS_DB"],
+                        database: process.env["NAME_DB"],
+                        port: process.env["PORT_DB"],
                         ssl: true
     };
     
@@ -14,11 +14,9 @@ module.exports = async function (context, eventHubMessages) {
     var client = new pg.Client(config);
     const query = 'insert into iotdata(deviceid, data) values(' + '\'' + eventHubMessages.deviceId + '\'' + ',\'' + JSON.stringify(eventHubMessages) + '\');';
     
-    context.log(query);
-    
     await client.connect();
     await client.query(query);
     await client.end();
 
-    context.log('insert completed successfully!');
+    // context.log('insert completed successfully!');
 };
