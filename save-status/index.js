@@ -16,9 +16,10 @@ module.exports = async function (context, req) {
 
     const client = new pg.Client(config);
     const updated_at = new Date().toISOString();
-    const query = 'update response_functions set status = ' + '\'' + status + '\'' + ', msg = ' + '\'' + result + '\'' +', updated_at = ' + '\'' + updated_at + '\'' + ' where id = ' + '\'' + msgId + '\'';
+   // const query = 'update response_functions set status = ' + '\'' + status + '\'' + ', msg = ' + '\'' + result + '\'' +', updated_at = ' + '\'' + updated_at + '\'' + ' where id = ' + '\'' + msgId + '\''+ ';';
+    const query = 'UPDATE public.response_functions SET status = ' + '\'' + status + '\'' + ', msg = ' + '\'' + result + '\'' + ', updated_at = ' + '\'' + updated_at + '\'' + ' WHERE id = ' + '\'' + msgId + '\''+ ';';
 
-    // console.log(query);
+    console.log(query);
     
     await client.connect();
     await client.query(query);
@@ -26,6 +27,6 @@ module.exports = async function (context, req) {
 
     context.res = {
         status: 200,
-        body: "insert completed successfully!"
+        body: "insert completed successfully!" + msgId,
     };
 };

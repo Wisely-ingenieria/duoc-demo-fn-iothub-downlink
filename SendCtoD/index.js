@@ -17,6 +17,7 @@ module.exports = async function (context, req) {
             if (err){
                 result = err.toString();
                 status = false;
+                saveResult(msgId);
             }
             if (res){
                 result = res.constructor.name;
@@ -28,11 +29,11 @@ module.exports = async function (context, req) {
         if (err) {
             result = err.toString();
             status = false;
-            saveResult();
+            saveResult(msgId);
         } else {
             receiver.on('message', function (msg) {
                 result = msg.getData().toString('utf-8');
-                saveResult();
+                saveResult(JSON.parse(result)[0].originalMessageId);
             })
         }
     }
@@ -42,22 +43,28 @@ module.exports = async function (context, req) {
             result = err.message;
             status = false;
         } else {
-            var message = new Message(JSON.stringify({
-                time: deviceTime,
+            let message = new Message(JSON.stringify({
+                deviceid: deviceId,
             }));
+            if(deviceTime){
+                message = new Message(JSON.stringify({
+                    time: deviceTime,
+                }));
+            }
             message.ack = 'full';
             message.messageId = msgId;
+            console.log('message: '+message.getData());
             serviceClient.send(deviceId, message, printResultFor('send'));
             serviceClient.getFeedbackReceiver(receiveFeedback);
         }
     });
 
-    function saveResult() {
+    function saveResult(id) {
         try {
             const request = require('axios');
             const url = process.env["SAVE_STATUS_URL"];
             const data = {
-                id: msgId,
+                id: id,
                 result: result,
                 status: status
             };
@@ -75,7 +82,7 @@ module.exports = async function (context, req) {
         }
     };
 
-    const responseMessage = deviceId + " " + deviceTime + " " + msgId
+    const responseMessage = deviceId + " " + " " + msgId
         ? result
         : "Pass a params in the query string or in the request body for a personalized response.";
 
