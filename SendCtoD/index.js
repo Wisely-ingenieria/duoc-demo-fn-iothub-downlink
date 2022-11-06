@@ -9,23 +9,24 @@ module.exports = async function (context, req) {
     const deviceId = (req.query.deviceid || (req.body && req.body.deviceid));
     const deviceTime = (req.query.time || (req.body && req.body.time));
     const msgId = (req.query.id || (req.body && req.body.id));
+    const payload = (req.query.payload || (req.body && req.body.payload));
     let result = 'success';
     let status = true;
 
     function printResultFor(op) {
         return function printResult(err, res) {
-            if (err){
+            if (err) {
                 result = err.toString();
                 status = false;
                 saveResult(msgId);
             }
-            if (res){
+            if (res) {
                 result = res.constructor.name;
             }
         };
     }
 
-    function receiveFeedback(err, receiver){
+    function receiveFeedback(err, receiver) {
         if (err) {
             result = err.toString();
             status = false;
@@ -38,6 +39,19 @@ module.exports = async function (context, req) {
         }
     }
 
+    // convert array sensors to json
+    let sensors = null;
+    if (payload.UART) {
+        payload.UART.sensors.forEach((sensor) => {
+            const key = Object.keys(sensor)[0];
+            const value = sensor[key];
+            sensors = {
+                ...sensors,
+                [key]: value
+            };
+        });
+        payload.UART.sensors = sensors;
+    }
     serviceClient.open(function (err) {
         if (err) {
             result = err.message;
@@ -45,15 +59,17 @@ module.exports = async function (context, req) {
         } else {
             let message = new Message(JSON.stringify({
                 deviceid: deviceId,
+                payload: payload,
             }));
-            if(deviceTime){
+            if (deviceTime) {
                 message = new Message(JSON.stringify({
                     time: deviceTime,
+                    payload: payload,
                 }));
             }
             message.ack = 'full';
             message.messageId = msgId;
-            console.log('message: '+message.getData());
+            console.log('message: ' + message.getData());
             serviceClient.send(deviceId, message, printResultFor('send'));
             serviceClient.getFeedbackReceiver(receiveFeedback);
         }
@@ -68,11 +84,12 @@ module.exports = async function (context, req) {
                 result: result,
                 status: status
             };
-            request.post(url, data,{
+            request.post(url, data, {
                 headers: {
                     'Content-Type': 'application/json',
                     'x-functions-key': process.env["FUNCTION_KEY_SAVE_STATUS"]
-            }}).then(function (response) {
+                }
+            }).then(function (response) {
                 // console.log(response.data);
             }).catch(function (error) {
                 // console.log(error);
@@ -82,37 +99,37 @@ module.exports = async function (context, req) {
         }
     };
 
-    const responseMessage = deviceId + " " + " " + msgId
-        ? result
-        : "Pass a params in the query string or in the request body for a personalized response.";
+    const responseMessage = deviceId + " " + " " + msgId ?
+        result :
+        "Pass a params in the query string or in the request body for a personalized response.";
 
     context.res = {
         // status: 200, /* Defaults to 200 */
         body: responseMessage
     };
 
-    
+
 
     function printResultFor(op) {
         return function printResult(err, res) {
-            if (err){
+            if (err) {
                 // console.log(op + ' error: ' + err.toString());
                 result = err.toString();
             }
-            if (res){
+            if (res) {
                 // console.log(op + ' status: ' + res.constructor.name);
                 result = res.constructor.name;
             }
         };
     }
 
-    function receiveFeedback(err, receiver){
+    function receiveFeedback(err, receiver) {
         receiver.on('message', function (msg) {
-        // console.log('Feedback message:')
-        // console.log(msg.getData().toString('utf-8'));
-        result = msg.getData().toString('utf-8');
+            // console.log('Feedback message:')
+            // console.log(msg.getData().toString('utf-8'));
+            result = msg.getData().toString('utf-8');
         });
     }
 
-    
+
 }
