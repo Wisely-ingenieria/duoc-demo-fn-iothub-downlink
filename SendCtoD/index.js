@@ -40,8 +40,8 @@ module.exports = async function (context, req) {
     }
 
     // convert array sensors to json
-    let sensors = null;
     if (payload.UART) {
+        let sensors = null;
         payload.UART.sensors.forEach((sensor) => {
             const key = Object.keys(sensor)[0];
             const value = sensor[key];
@@ -51,6 +51,20 @@ module.exports = async function (context, req) {
             };
         });
         payload.UART.sensors = sensors;
+    }
+
+    // convert array digital to json
+    if (payload.DI) {
+        let digital = {'use': payload.DI.use};
+        payload.DI.DI.forEach((sensor) => {
+            const key = Object.keys(sensor)[0];
+            const value = sensor[key];
+            digital = {
+                ...digital,
+                [key]: value
+            };
+        });
+        payload.DI = digital;
     }
     serviceClient.open(function (err) {
         if (err) {
