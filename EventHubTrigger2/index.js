@@ -1,22 +1,26 @@
 module.exports = async function (context, eventHubMessages) {
-    var pg = require('pg');
-    
-    const config = {
-                        host: process.env["HOST_DB"],
-                        user: process.env["USER_DB"],
-                        password: process.env["PASS_DB"],
-                        database: process.env["NAME_DB"],
-                        port: process.env["PORT_DB"],
-                        ssl: true
-    };
-    
-    
-    var client = new pg.Client(config);
-    const query = 'insert into iotdata(deviceid, data) values(' + '\'' + eventHubMessages.deviceId + '\'' + ',\'' + JSON.stringify(eventHubMessages) + '\');';
-    
-    await client.connect();
-    await client.query(query);
-    await client.end();
+    try {
+        const axios = require('axios');
+        const device = eventHubMessages.deviceId;
+        const data = eventHubMessages;
 
-    // context.log('insert completed successfully!');
+        // send data to api biotraz
+        const url = process.env["URL_API"];
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + process.env["TOKEN_API"]
+        };
+
+        try {
+            const response = await axios.post(url, {
+                device,
+                data
+            }, { headers });
+        } catch (error) {
+            context.log('send failed!', error)
+        }
+        context.log('send completed successfully!');
+    } catch (error) {
+        context.log('send failed!', error);
+    }
 };
