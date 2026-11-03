@@ -1,5 +1,5 @@
 [
-  { "name": "PGHOST", "value": "psql.postgres.database.azure.com", "slotSetting": false },
+  { "name": "PGHOST", "value": "server.postgres.database.azure.com", "slotSetting": false },
   { "name": "PGPORT", "value": "5432", "slotSetting": false },
   { "name": "PGDATABASE", "value": "curso_duoc", "slotSetting": false },
   { "name": "PGUSER", "value": "user_curso_duoc", "slotSetting": false },
