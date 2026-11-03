@@ -1,4 +1,0 @@
-cpnexion iot hub = Endpoint=sb://ihsuprodbnres006dednamespace.servicebus.windows.net/;SharedAccessKeyName=iothubowner;SharedAccessKey=CzZQE4qsr4/FAjSsL7RAQ1bICXu7csegigawSCM07lE=;EntityPath=iothub-ehub-bionova-io-13659293-65f442422b
-
-conexion azureWebJobsStorage=DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=storageaccountbionova;AccountKey=D1H7Kb2szQLbIQKCl2xCJQuiVqUYIT4clcCIFPcvaxpSBu1eso9nR9nqKA1qrvAYr9yx1qyn1il8Uxs5uvTmow==
-

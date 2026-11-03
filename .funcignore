@@ -3,5 +3,13 @@
 .git*
 .vscode
 local.settings.json
-test
 tsconfig.json
+.env
+.env.*
+variables
+AGENTS.md
+README.md
+eslint.config.js
+database
+scripts
+**/sample.dat
