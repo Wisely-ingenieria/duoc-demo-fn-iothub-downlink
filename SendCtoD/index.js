@@ -14,6 +14,11 @@ try {
   }
 }
 
+const devices = (process.env.DEVICES ?? "")
+  .split(",")
+  .map((deviceId) => deviceId.trim())
+  .filter(Boolean);
+
 // Send a cloud-to-device message through IoT Hub.
 async function sendCommand(request, context) {
   context.log("Received command request", { requestBody: request.body });
@@ -28,7 +33,7 @@ async function sendCommand(request, context) {
     return { status: 400, jsonBody: { error: "deviceId and payload are required" } };
   }
 
-  if (body.deviceId !== 'DUOC-TEST') {
+  if (!devices.includes(body.deviceId)) {
     return { status: 400, jsonBody: { error: "Invalid deviceId" } };
   }
 

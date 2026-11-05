@@ -11,6 +11,11 @@ try {
   }
 }
 
+const devices = (process.env.DEVICES ?? "")
+  .split(",")
+  .map((deviceId) => deviceId.trim())
+  .filter(Boolean);
+
 // Verify the certificate on Azure; disable SSL locally with PGSSL=false.
 const pool = new Pool({
   host: process.env.PGHOST,
@@ -25,7 +30,7 @@ const pool = new Pool({
 async function receiveTelemetry(message, context) {
     
   const deviceId = context.triggerMetadata.systemProperties["iothub-connection-device-id"];
-  if (deviceId !== 'DUOC-TEST') {
+  if (!devices.includes(deviceId)) {
     context.log("Telemetry ignored", { deviceId });
     return;
   }
